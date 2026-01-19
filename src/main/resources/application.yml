@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: artist-manager
+  
+  # Configuração do Banco de Dados (Docker)
+  datasource:
+    url: jdbc:postgresql://localhost:5433/seplag_db
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  # Configuração do Flyway (Item 6.3.1-k do edital)
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  # Configuração do JPA/Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: update # Sênior não usa 'update', usa migrações oficiais
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# Configurações customizadas que usaremos depois
+app:
+  jwt:
+    secret: dGhpcy1pcy1hLXZlcnktc2VjdXJlLWtlLWZvci1zZXBsYWctbXQtMjAyNi1wcm9qZWN0LXNlbmlvci=
+    expiration-minutes: 5 # Exigência do edital
+  minio:
+    endpoint: http://localhost:9000
+    access-key: admin
+    secret-key: password123
+    bucket: seplag-assets
