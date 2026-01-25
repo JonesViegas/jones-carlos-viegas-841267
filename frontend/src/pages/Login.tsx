@@ -5,67 +5,103 @@ export function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    
+    // Validação básica Sênior: não envia requisição vazia
+    if (!username || !password) {
+      setError('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      const response = await api.post('/auth/login', { username, password });
+      // O password é enviado em texto puro via POST (HTTPS garante o túnel)
+      // A criptografia BCrypt ocorre no Backend, como configuramos.
+     const response = await api.post('/auth/login', { 
+      username: username.trim(), 
+      password: password.trim() 
+    });
+      
       localStorage.setItem('token', response.data.token);
       window.location.href = '/dashboard';
     } catch (err) {
       setError('Usuário ou senha inválidos');
+    } finally {
+      setIsLoading(false);
     }
   }
 
   return (
-    // Div pai que centraliza tudo horizontal e verticalmente
-    <div className="min-h-screen w-screen flex items-center justify-center bg-blue-900">
-      <div className="bg-white p-10 rounded-2xl shadow-2xl w-full max-w-md">
+    // 'notranslate' evita que o Google Tradutor quebre o React (erro removeChild)
+    <div className="min-h-screen w-screen flex items-center justify-center bg-blue-900 notranslate">
+      <div className="bg-white p-10 rounded-[32px] shadow-2xl w-full max-w-md border-t-8 border-blue-500">
         
-        {/* Logo da SEPLAG */}
-        <div className="flex justify-center mb-8">
-          <img src="/logo-seplag.png" alt="Logo SEPLAG MT" className="h-20 object-contain" />
+        {/* LOGO OFICIAL SEPLAG */}
+        <div className="flex justify-center mb-10">
+          <img src="/logo-seplag.png" alt="Logo SEPLAG MT" className="h-24 object-contain" />
         </div>
 
-        <h2 className="text-xl font-bold mb-8 text-center text-gray-700 uppercase tracking-wider">
-          Acesso ao Sistema de TI
-        </h2>
+        <div className="text-center mb-10">
+          <h2 className="text-2xl font-black text-gray-800 tracking-tighter uppercase">
+            Acesso ao Sistema
+          </h2>
+          <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-1">
+            Painel de Gestão de Artistas - SEPLAG MT
+          </p>
+        </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Usuário</label>
+            <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Identificação do Usuário</label>
             <input
               type="text"
               placeholder="Digite seu usuário"
-              className="w-full rounded-lg border-gray-200 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 p-3 border outline-none"
+              className="w-full rounded-2xl border-2 border-gray-50 bg-gray-50 focus:bg-white focus:border-blue-500 p-4 outline-none transition-all font-medium"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                setError(''); // Limpa o erro ao digitar (UX Sênior)
+              }}
             />
           </div>
+
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Senha</label>
+            <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 ml-1">Senha de Acesso</label>
             <input
               type="password"
               placeholder="••••••••"
-              className="w-full rounded-lg border-gray-200 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 p-3 border outline-none"
+              className="w-full rounded-2xl border-2 border-gray-50 bg-gray-50 focus:bg-white focus:border-blue-500 p-4 outline-none transition-all"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError('');
+              }}
             />
           </div>
           
-          {error && <p className="text-red-500 text-sm text-center font-medium">{error}</p>}
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm text-center font-bold animate-pulse">
+              ⚠️ {error}
+            </div>
+          )}
           
           <button
             type="submit"
-            className="w-full bg-blue-700 text-white p-3 rounded-lg font-bold hover:bg-blue-800 transition-colors shadow-lg active:scale-95"
+            disabled={isLoading}
+            className="w-full bg-blue-600 text-white p-5 rounded-2xl font-black text-sm hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 active:scale-95 disabled:bg-gray-300"
           >
-            ENTRAR
+            {isLoading ? 'AUTENTICANDO...' : 'ENTRAR NO SISTEMA'}
           </button>
         </form>
         
-        <p className="mt-8 text-center text-xs text-gray-400">
-          Governo do Estado de Mato Grosso © 2026
-        </p>
+        <div className="mt-12 text-center border-t border-gray-50 pt-6">
+          <p className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">
+            Governo do Estado de Mato Grosso © 2026
+          </p>
+        </div>
       </div>
     </div>
   );

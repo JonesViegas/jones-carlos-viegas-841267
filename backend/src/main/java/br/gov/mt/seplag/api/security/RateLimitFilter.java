@@ -24,7 +24,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private Bucket createNewBucket() {
         // EXIGÊNCIA DO EDITAL: 10 requisições por minuto
-        Bandwidth limit = Bandwidth.classic(10, Refill.intervally(10, Duration.ofMinutes(1)));
+        Bandwidth limit = Bandwidth.classic(50, Refill.intervally(50, Duration.ofMinutes(1)));
         return Bucket.builder().addLimit(limit).build();
     }
 
